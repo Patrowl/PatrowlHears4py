@@ -35,7 +35,6 @@ class PatrowlHearsApi:
         except requests.exceptions.RequestException as e:
             raise PatrowlHearsException("Unable to retrieve vuln: {}".format(e))
 
-    # Vulnerabilities
     def get_vulns_stats(self):
         """
         Get vulnerability statistics.
@@ -47,7 +46,6 @@ class PatrowlHearsApi:
         except requests.exceptions.RequestException as e:
             raise PatrowlHearsException("Unable to retrieve vuln stats: {}".format(e))
 
-    # Vulnerabilities
     def get_vuln(self, vuln_id):
         """
         Get vulnerability info by his ID.
@@ -60,7 +58,6 @@ class PatrowlHearsApi:
         except requests.exceptions.RequestException as e:
             raise PatrowlHearsException("Unable to retrieve vuln: {}".format(e))
 
-    # Vuln / Exploits
     def get_vuln_exploits(self, vuln_id):
         """
         Get exploits related to a vulnerability by his ID.
@@ -73,7 +70,6 @@ class PatrowlHearsApi:
         except requests.exceptions.RequestException as e:
             raise PatrowlHearsException("Unable to retrieve vuln exploits: {}".format(e))
 
-    # Vuln / Threats
     def get_vuln_threats(self, vuln_id):
         """
         Get threats related to a vulnerability by his ID.
@@ -86,7 +82,6 @@ class PatrowlHearsApi:
         except requests.exceptions.RequestException as e:
             raise PatrowlHearsException("Unable to retrieve vuln threats: {}".format(e))
 
-    # Vuln / History
     def get_vuln_history(self, vuln_id):
         """
         Get vulnerability changes history by his ID.
@@ -99,7 +94,6 @@ class PatrowlHearsApi:
         except requests.exceptions.RequestException as e:
             raise PatrowlHearsException("Unable to get vuln history: {}".format(e))
 
-    # Vuln / Monitoring status
     def toggle_vuln_monitoring(self, vuln_id):
         """
         Toggle monitoring status of a vulnerability by his ID.
@@ -112,7 +106,6 @@ class PatrowlHearsApi:
         except requests.exceptions.RequestException as e:
             raise PatrowlHearsException("Unable to toggle vuln monitoring status: {}".format(e))
 
-    # Vuln / Refresh Score
     def refresh_vuln_score(self, vuln_id):
         """
         Refresh vulnerability score by his ID.
