@@ -66,12 +66,17 @@ class PatrowlHearsApi:
         except requests.exceptions.RequestException as e:
             raise PatrowlHearsException("Unable to retrieve vuln stats: {}".format(e))
 
-    def search_vulns(self, cveid=None, monitored=None):
+    def search_vulns(self, cveid=None, monitored=None, search=None, vendor_name=None, product_name=None, product_version=None, cpe=None):
         """
         Get vulnerabilities from criterias.
 
         :param cveid: CVE-ID
         :param monitored: Is monitored
+        :param search: search entry
+        :param vendor_name: Vendor name
+        :param product_name: Product name
+        :param product_version: Product version
+        :param cpe: CPE vector
         :rtype: json
         """
         filters = ""
@@ -79,6 +84,16 @@ class PatrowlHearsApi:
             filters += "&cveid={}".format(cveid)
         if monitored is not None:
             filters += "&monitored={}".format(str(monitored).lower())
+        if search is not None and search != '':
+            filters += "&search={}".format(str(search))
+        if vendor_name is not None and vendor_name != '':
+            filters += "&vendor_name={}".format(str(vendor_name).lower())
+        if product_name is not None and product_name != '':
+            filters += "&product_name={}".format(str(product_name).lower())
+        if product_version is not None and product_version != '':
+            filters += "&product_version={}".format(str(product_version).lower())
+        if cpe is not None and cpe != '':
+            filters += "&cpe={}".format(str(cpe).lower())
 
         try:
             return self.rs.get(self.url+"/api/vulns/?{}".format(filters)).json()
