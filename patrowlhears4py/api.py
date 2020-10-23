@@ -1,6 +1,26 @@
 import requests
-
 from patrowlhears4py.exceptions import PatrowlHearsException
+
+VULN_ATTRS = {
+    'access_authentication': {
+        'values': ['NONE', 'SINGLE', 'MULTIPLE'], 'default': 'NONE'
+    },
+    'access_complexity': {
+        'values': ['LOW', 'MEDIUM', 'HIGH'], 'default': 'LOW'
+    },
+    'access_vector': {
+        'values': ['LOCAL', 'ADJACENT_NETWORK', 'NETWORK'], 'default': 'LOCAL'
+    },
+    'impact_availability': {
+        'values': ['NONE', 'PARTIAL', 'COMPLETE'], 'default': 'NONE'
+    },
+    'impact_confidentiality': {
+        'values': ['NONE', 'PARTIAL', 'COMPLETE'], 'default': 'NONE'
+    },
+    'impact_integrity': {
+        'values': ['NONE', 'PARTIAL', 'COMPLETE'], 'default': 'NONE'
+    },
+}
 
 
 class PatrowlHearsApi:
@@ -64,6 +84,90 @@ class PatrowlHearsApi:
             return self.rs.get(self.url+"/api/vulns/?{}".format(filters)).json()
         except requests.exceptions.RequestException as e:
             raise PatrowlHearsException("Unable to retrieve vuln: {}".format(e))
+
+    def add_vuln(self, vuln):
+        """
+        Add a new vulnerability.
+
+        :param vuln: Vulnerability dict
+        :rtype: json
+        """
+        attrs = ['summary']
+        if all(elem in vuln.keys() for elem in attrs) is False:
+            raise PatrowlHearsException("Missing parameters")
+
+        data = {
+            'cve_id': '',
+            'summary': vuln['summary'],
+        }
+        for attr in vuln.keys():
+            if attr == 'cve_id':
+                data.update({'cve_id': vuln['cve_id'].upper()})
+            if attr == 'cvss2':
+                data.update({'cvss2': vuln['cvss2']})
+            if attr == 'cvss2_vector':
+                data.update({'cvss2_vector': vuln['cvss2_vector']})
+            if attr == 'cvss3':
+                data.update({'cvss3': vuln['cvss3']})
+            if attr == 'cvss3_vector':
+                data.update({'cvss3_vector': vuln['cvss3_vector']})
+            if attr == 'cwe':
+                data.update({'cwe': vuln['cwe']})
+            if attr == 'cpes':
+                data.update({'cpes': vuln['cpes']})
+
+            if attr == 'access_authentication'
+                if vuln['access_authentication'] in VULN_ATTRS['access_authentication']['values']:
+                    data.update({'access_authentication': vuln['access_authentication']})
+                else:
+                    data.update({'access_authentication': VULN_ATTRS['access_authentication']['default']})
+            if attr == 'access_complexity'
+                if vuln['access_complexity'] in VULN_ATTRS['access_complexity']['values']:
+                    data.update({'access_complexity': vuln['access_complexity']})
+                else:
+                    data.update({'access_complexity': VULN_ATTRS['access_complexity']['default']})
+            if attr == 'access_vector'
+                if vuln['access_vector'] in VULN_ATTRS['access_vector']['values']:
+                    data.update({'access_vector': vuln['access_vector']})
+                else:
+                    data.update({'access_vector': VULN_ATTRS['access_vector']['default']})
+            if attr == 'impact_confidentiality'
+                if vuln['impact_confidentiality'] in VULN_ATTRS['impact_confidentiality']['values']:
+                    data.update({'impact_confidentiality': vuln['impact_confidentiality']})
+                else:
+                    data.update({'impact_confidentiality': VULN_ATTRS['impact_confidentiality']['default']})
+            if attr == 'impact_integrity'
+                if vuln['impact_integrity'] in VULN_ATTRS['impact_integrity']['values']:
+                    data.update({'impact_integrity': vuln['impact_integrity']})
+                else:
+                    data.update({'impact_integrity': VULN_ATTRS['impact_integrity']['default']})
+            if attr == 'impact_availability'
+                if vuln['impact_availability'] in VULN_ATTRS['impact_availability']['values']:
+                    data.update({'impact_availability': vuln['impact_availability']})
+                else:
+                    data.update({'impact_availability': VULN_ATTRS['impact_availability']['default']})
+
+            if attr == 'monitored' and type(vuln['monitored']) is bool:
+                data.update({'monitored': vuln['monitored']})
+            if attr == 'is_exploitable' and type(vuln['is_exploitable']) is bool:
+                data.update({'is_exploitable': vuln['is_exploitable']})
+            if attr == 'is_confirmed' and type(vuln['is_confirmed']) is bool:
+                data.update({'is_confirmed': vuln['is_confirmed']})
+            if attr == 'is_in_the_news' and type(vuln['is_in_the_news']) is bool:
+                data.update({'is_in_the_news': vuln['is_in_the_news']})
+            if attr == 'is_in_the_wild' and type(vuln['is_in_the_wild']) is bool:
+                data.update({'is_in_the_wild': vuln['is_in_the_wild']})
+            if attr == 'cpes' and type(vuln['cpes']) is str:
+                data.update({'cpes': vuln['cpes']})
+            if attr == 'products' and type(vuln['products']) is list:
+                data.update({'products': vuln['products']})
+            if attr == 'references':
+                data.update({'references': vuln['references']})
+
+        try:
+            return self.rs.post(self.url+"/api/vulns/add", data).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlHearsException("Unable to add vuln: {}".format(e))
 
     def get_vuln(self, vuln_id):
         """
