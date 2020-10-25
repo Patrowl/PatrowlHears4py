@@ -43,6 +43,23 @@ class PatrowlHearsApi:
         self.rs.verify = ssl_verify
         self.rs.timeout = timeout
 
+    # Generic command
+    def action(self, url, method='GET', data=None):
+        """
+        Generic action.
+
+        :rtype: json
+        """
+        if method not in ['GET', 'POST', 'DELETE', 'PUT', 'PATCH']:
+            raise PatrowlHearsException("Bad method: {}".format(method))
+
+        try:
+            r = requests.Request(method=method, url=self.url+url, data=data)
+            pr = r.prepare()
+            return self.rs.send(pr).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlHearsException("Unable to retrieve vuln: {}".format(e))
+
     # Vulnerabilities
     def get_latest_vulns(self):
         """
