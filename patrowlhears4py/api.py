@@ -30,15 +30,19 @@ class PatrowlHearsApi:
         """
         Initialize a PatrowlHearsApi object.
 
-        :param url: PatrowlHears URL
+        :param url: PatrowlHears base URL
         :param auth_token: The API key
         :param proxies: The HTTP/HTTPS proxy endpoints
         :param ssl_verify: SSL/TLS certificate verification
         :param timeout: Request timeout (in sec)
         """
+
         self.url = url
+        self.auth_token = auth_token
+        self.timeout = timeout
         self.rs = requests.Session()
-        self.rs.headers['Authorization'] = 'Token {}'.format(auth_token)
+        # self.rs.headers['Authorization'] = 'Token {}'.format(auth_token)
+        self.rs.headers.update({'Authorization': 'Token {}'.format(auth_token)})
         self.rs.proxies = proxies
         self.rs.verify = ssl_verify
         self.rs.timeout = timeout
@@ -54,7 +58,7 @@ class PatrowlHearsApi:
             raise PatrowlHearsException("Bad method: {}".format(method))
 
         try:
-            r = requests.Request(method=method, url=self.url+url, data=data)
+            r = requests.Request(method=method, url=self.url+url, data=data, headers={'Authorization': 'Token {}'.format(self.auth_token)})
             pr = r.prepare()
             return self.rs.send(pr).json()
         except requests.exceptions.RequestException as e:
@@ -148,32 +152,32 @@ class PatrowlHearsApi:
             if attr == 'cpes':
                 data.update({'cpes': vuln['cpes']})
 
-            if attr == 'access_authentication'
+            if attr == 'access_authentication':
                 if vuln['access_authentication'] in VULN_ATTRS['access_authentication']['values']:
                     data.update({'access_authentication': vuln['access_authentication']})
                 else:
                     data.update({'access_authentication': VULN_ATTRS['access_authentication']['default']})
-            if attr == 'access_complexity'
+            if attr == 'access_complexity':
                 if vuln['access_complexity'] in VULN_ATTRS['access_complexity']['values']:
                     data.update({'access_complexity': vuln['access_complexity']})
                 else:
                     data.update({'access_complexity': VULN_ATTRS['access_complexity']['default']})
-            if attr == 'access_vector'
+            if attr == 'access_vector':
                 if vuln['access_vector'] in VULN_ATTRS['access_vector']['values']:
                     data.update({'access_vector': vuln['access_vector']})
                 else:
                     data.update({'access_vector': VULN_ATTRS['access_vector']['default']})
-            if attr == 'impact_confidentiality'
+            if attr == 'impact_confidentiality':
                 if vuln['impact_confidentiality'] in VULN_ATTRS['impact_confidentiality']['values']:
                     data.update({'impact_confidentiality': vuln['impact_confidentiality']})
                 else:
                     data.update({'impact_confidentiality': VULN_ATTRS['impact_confidentiality']['default']})
-            if attr == 'impact_integrity'
+            if attr == 'impact_integrity':
                 if vuln['impact_integrity'] in VULN_ATTRS['impact_integrity']['values']:
                     data.update({'impact_integrity': vuln['impact_integrity']})
                 else:
                     data.update({'impact_integrity': VULN_ATTRS['impact_integrity']['default']})
-            if attr == 'impact_availability'
+            if attr == 'impact_availability':
                 if vuln['impact_availability'] in VULN_ATTRS['impact_availability']['values']:
                     data.update({'impact_availability': vuln['impact_availability']})
                 else:
