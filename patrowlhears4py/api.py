@@ -54,11 +54,11 @@ class PatrowlHearsApi:
 
         :rtype: json
         """
-        if method not in ['GET', 'POST', 'DELETE', 'PUT', 'PATCH']:
+        if method.upper() not in ['GET', 'POST', 'DELETE', 'PUT', 'PATCH']:
             raise PatrowlHearsException("Bad method: {}".format(method))
 
         try:
-            r = requests.Request(method=method, url=self.url+url, data=data, headers={'Authorization': 'Token {}'.format(self.auth_token)})
+            r = requests.Request(method=method.upper(), url=self.url+url, data=data, headers={'Authorization': 'Token {}'.format(self.auth_token)})
             pr = r.prepare()
             return self.rs.send(pr).json()
         except requests.exceptions.RequestException as e:
