@@ -36,7 +36,6 @@ class PatrowlHearsApi:
         :param ssl_verify: SSL/TLS certificate verification
         :param timeout: Request timeout (in sec)
         """
-
         self.url = url
         self.auth_token = auth_token
         self.timeout = timeout
@@ -48,17 +47,26 @@ class PatrowlHearsApi:
         self.rs.timeout = timeout
 
     # Generic command
-    def action(self, url, method='GET', data=None):
+    def action(self, url, method='GET', data=None, params={}):
         """
-        Generic action.
+        Call a generic action.
 
+        :param url: API endpoint
+        :param method: HTTP method ('GET', 'POST', 'DELETE', 'PUT', 'PATCH')
+        :param data: HTTP data
         :rtype: json
         """
         if method.upper() not in ['GET', 'POST', 'DELETE', 'PUT', 'PATCH']:
             raise PatrowlHearsException("Bad method: {}".format(method))
 
         try:
-            r = requests.Request(method=method.upper(), url=self.url+url, data=data, headers={'Authorization': 'Token {}'.format(self.auth_token)})
+            r = requests.Request(
+                method=method.upper(),
+                url=self.url+url,
+                data=data,
+                params=params,
+                headers={'Authorization': 'Token {}'.format(self.auth_token)}
+            )
             pr = r.prepare()
             return self.rs.send(pr).json()
         except requests.exceptions.RequestException as e:
@@ -87,21 +95,23 @@ class PatrowlHearsApi:
         except requests.exceptions.RequestException as e:
             raise PatrowlHearsException("Unable to retrieve vuln stats: {}".format(e))
 
-    def search_vulns(self, cveid=None, monitored=None, search=None, vendor_name=None, product_name=None, product_version=None, cpe=None):
+    def search_vulns(self, cveid=None, monitored=None, search=None, vendor_name=None, product_name=None, product_version=None, cpe=None, page=1, limit=10):
         """
         Get vulnerabilities from criterias.
 
         :param cveid: CVE-ID
-        :param monitored: Is monitored
+        :param monitored: Return only monitored items
         :param search: search entry
         :param vendor_name: Vendor name
         :param product_name: Product name
         :param product_version: Product version
         :param cpe: CPE vector
+        :param page: Page number of results
+        :param limit: Max results per page. Default is 10, Max is 100 (Optional)
         :rtype: json
         """
-        filters = ""
-        if cveid is not None:
+        filters = "?page={}&limit={}".format(page, limit)
+        if cveid is not None and cveid != '':
             filters += "&cveid={}".format(cveid)
         if monitored is not None:
             filters += "&monitored={}".format(str(monitored).lower())
@@ -299,7 +309,6 @@ class PatrowlHearsApi:
         :param to: Search data to date (format: YYYY-MM-DD). Optional.
         :rtype: json
         """
-
         url = self.url+"/api/data/export/info?"
         if since is not None:
             url = "{}&since={}".format(url, since)
@@ -319,7 +328,6 @@ class PatrowlHearsApi:
         :param limit: Limit rows per table. Optional.
         :rtype: json
         """
-
         url = self.url+"/api/data/export/full?"
         if since is not None:
             url = "{}&since={}".format(url, since)
@@ -335,12 +343,11 @@ class PatrowlHearsApi:
 
     def add_exploit(self, exploit):
         """
-        Add exploit (based on CVE-ID)
+        Add exploit (based on CVE-ID).
 
         :param exploit: Exploit
         :rtype: json
         """
-
         attrs = ['link', 'cveid']
         if all(elem in exploit.keys() for elem in attrs) is False:
             raise PatrowlHearsException("Missing parameters")
@@ -380,14 +387,59 @@ class PatrowlHearsApi:
 
     def del_org_exploit(self, vuln_id, exploit_id):
         """
-        Delete exploit (based on CVE-ID)
+        Delete exploit (based on CVE-ID).
 
         :param vuln_id: Vuln ID
         :param exploit_id: Exploit ID
         :rtype: json
         """
-
         try:
             return self.rs.get(self.url+"/api/vulns/{}/exploits/{}/del".format(vuln_id, exploit_id)).json()
         except requests.exceptions.RequestException as e:
             raise PatrowlHearsException("Unable to delete exploit: {}".format(e))
+
+    # Vendors and products
+    def get_vendors(self, search=None, monitored=False, page=1, limit=10):
+        """
+        Get vendors.
+
+        :param search: filter on name (Optional)
+        :param page: Page number of results (Optional)
+        :param monitored: Return only monitored vendors (Optional)
+        :param limit: Max results per page. Default is 10, Max is 100 (Optional)
+        :rtype: json
+        """
+        params = "?page={}&limit={}".format(page, limit)
+        if search not in [None, '']:
+            params += "&search={}".format(search)
+        if monitored is True:
+            params += "&monitored=true"
+
+        try:
+            return self.rs.get(self.url+"/api/kb/vendors/{}".format(params)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlHearsException("Unable to list vendors: {}".format(e))
+
+    def get_products(self, vendor_id=None, search=None, monitored=False, page=1, limit=10):
+        """
+        Get products from a vendor.
+
+        :param vendor_id: Vendor ID
+        :param search: filter on name (Optional)
+        :param page: Page number of results (Optional)
+        :param monitored: Return only monitored vendors (Optional)
+        :param limit: Max results per page. Default is 10, Max is 100 (Optional)
+        :rtype: json
+        """
+        params = "?page={}&limit={}".format(page, limit)
+        if vendor_id not in [None, '']:
+            params += "&vendor_id={}".format(vendor_id)
+        if search not in [None, '']:
+            params += "&search={}".format(search)
+        if monitored is True:
+            params += "&monitored=true"
+
+        try:
+            return self.rs.get(self.url+"/api/kb/vendors/{}".format(params)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlHearsException("Unable to list vendors: {}".format(e))

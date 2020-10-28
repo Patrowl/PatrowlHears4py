@@ -7,7 +7,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='PatrowlHears4py',
-    version='1.0.10',
+    version='1.1.0',
     description='Python API client for PatrowlHears',
     url='https://github.com/Patrowl/PatrowlHears4py',
     author='Nicolas Mattiocco',
