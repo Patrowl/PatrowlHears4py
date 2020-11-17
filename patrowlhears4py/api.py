@@ -65,7 +65,10 @@ class PatrowlHearsApi:
                 url=self.url+url,
                 data=data,
                 params=params,
-                headers={'Authorization': 'Token {}'.format(self.auth_token)}
+                headers={
+                    'Authorization': 'Token {}'.format(self.auth_token),
+                    'Content-Type': 'application/json'
+                }
             )
             pr = r.prepare()
             return self.rs.send(pr).json()
