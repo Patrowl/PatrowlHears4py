@@ -40,7 +40,6 @@ class PatrowlHearsApi:
         self.auth_token = auth_token
         self.timeout = timeout
         self.rs = requests.Session()
-        # self.rs.headers['Authorization'] = 'Token {}'.format(auth_token)
         self.rs.headers.update({'Authorization': 'Token {}'.format(auth_token)})
         self.rs.proxies = proxies
         self.rs.verify = ssl_verify
@@ -130,7 +129,7 @@ class PatrowlHearsApi:
             filters += "&cpe={}".format(str(cpe).lower())
 
         try:
-            return self.rs.get(self.url+"/api/vulns/?{}".format(filters)).json()
+            return self.rs.get(self.url+"/api/vulns/{}".format(filters)).json()
         except requests.exceptions.RequestException as e:
             raise PatrowlHearsException("Unable to retrieve vuln: {}".format(e))
 
@@ -446,3 +445,27 @@ class PatrowlHearsApi:
             return self.rs.get(self.url+"/api/kb/vendors/{}".format(params)).json()
         except requests.exceptions.RequestException as e:
             raise PatrowlHearsException("Unable to list vendors: {}".format(e))
+
+    def get_packages(self, type=None, name=None, monitored=False, page=1, limit=10):
+        """
+        Get packages list.
+
+        :param type: Package type (ex: npm, maven, pip, ...)
+        :param search: filter on name (Optional)
+        :param page: Page number of results (Optional)
+        :param monitored: Return only monitored vendors (Optional)
+        :param limit: Max results per page. Default is 10, Max is 100 (Optional)
+        :rtype: json
+        """
+        params = "?page={}&limit={}".format(page, limit)
+        if type not in [None, '']:
+            params += "&type={}".format(type)
+        if name not in [None, '']:
+            params += "&name={}".format(name)
+        if monitored is True:
+            params += "&monitored=true"
+
+        try:
+            return self.rs.get(self.url+"/api/kb/packages/{}".format(params)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlHearsException("Unable to list packages: {}".format(e))
