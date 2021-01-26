@@ -22,7 +22,7 @@ dependency_links = [x.strip().replace('git+', '') for x in all_reqs if 'git+' no
 
 setup(
     name='PatrowlHears4py',
-    version='1.2.0',
+    version='1.2.1',
     description='Python API client and CLI for PatrowlHears',
     url='https://github.com/Patrowl/PatrowlHears4py',
     author='Nicolas Mattiocco',
@@ -30,7 +30,7 @@ setup(
     license='AGPLv3',
     packages=find_packages(),
     install_requires=install_requires,
-    keyword="cve, vuln, vulnerabilities, security, nvd, exploit, poc",
+    keyword="cve, vuln, vulnerabilities, security, nvd, exploit, poc, secops",
     dependency_links=dependency_links,
     entry_points='''
         [console_scripts]

@@ -1,6 +1,7 @@
 import click
 # from patrowlhears4py.utils import is_vulnerable_version
 
+
 def print_vuln(vuln, hears_api, vuln_cnt, base_url):
     click.echo('--- Vuln %s ---' % vuln_cnt)
     click.echo('PatrowlHears ID: %s (%s)' % (vuln['id'], '{}/#/vulns/{}'.format(base_url, vuln['id'])))

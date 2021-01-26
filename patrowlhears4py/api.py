@@ -74,6 +74,21 @@ class PatrowlHearsApi:
         except requests.exceptions.RequestException as e:
             raise PatrowlHearsException("Unable to retrieve vuln: {}".format(e))
 
+    def get_orgs(self, page=1, limit=10):
+        """
+        Get Organizations.
+
+        :param page: Page number of results (Optional)
+        :param limit: Max results per page. Default is 10, Max is 100 (Optional)
+        :rtype: json
+        """
+        params = "?page={}&limit={}".format(page, limit)
+
+        try:
+            return self.rs.get(self.url+"/api/orgs/{}".format(params)).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlHearsException("Unable to list orgs: {}".format(e))
+
     # Vulnerabilities
     def get_latest_vulns(self):
         """
@@ -279,15 +294,81 @@ class PatrowlHearsApi:
         except requests.exceptions.RequestException as e:
             raise PatrowlHearsException("Unable to get vuln history: {}".format(e))
 
-    def toggle_vuln_monitoring(self, vuln_id):
+    def toggle_vendor_monitoring(self, organization_id, vendor_name, monitored):
+        """
+        Toggle monitoring status of a vendor by his name.
+
+        :param vendor_name: Vendor Name
+        :param organization_id: Organization ID
+        :param monitored: Boolean
+        :rtype: json
+        """
+        data = {
+            'monitored': monitored is True,
+            'organization_id': organization_id,
+            'vendor_name': vendor_name
+        }
+        try:
+            return self.rs.post(self.url+"/api/monitor/vendor/toggle", data).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlHearsException("Unable to toggle vendor monitoring status: {}".format(e))
+
+    def toggle_product_monitoring(self, organization_id, vendor_name, product_name, monitored):
+        """
+        Toggle monitoring status of a product by his name.
+
+        :param vendor_name: Vendor Name
+        :param product_name: Product Name
+        :param organization_id: Organization ID
+        :param monitored: Boolean
+        :rtype: json
+        """
+        data = {
+            'monitored': monitored is True,
+            'organization_id': organization_id,
+            'vendor_name': vendor_name,
+            'product_name': product_name
+        }
+        try:
+            return self.rs.post(self.url+"/api/monitor/product/toggle", data).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlHearsException("Unable to toggle product monitoring status: {}".format(e))
+
+    def toggle_package_monitoring(self, organization_id, package_id, monitored):
+        """
+        Toggle monitoring status of a vendor by his name.
+
+        :param package_id: Package ID
+        :param organization_id: Organization ID
+        :param monitored: Boolean
+        :rtype: json
+        """
+        data = {
+            'monitored': monitored is True,
+            'organization_id': organization_id,
+            'package_id': package_id
+        }
+        try:
+            return self.rs.post(self.url+"/api/monitor/package/toggle", data).json()
+        except requests.exceptions.RequestException as e:
+            raise PatrowlHearsException("Unable to toggle vendor monitoring status: {}".format(e))
+
+    def toggle_vuln_monitoring(self, organization_id, vuln_id, monitored):
         """
         Toggle monitoring status of a vulnerability by his ID.
 
         :param vuln_id: Vulnerability ID
+        :param organization_id: Organization ID
+        :param monitored: Boolean
         :rtype: json
         """
+        data = {
+            'monitored': monitored is True,
+            'organization_id': organization_id,
+            'vuln_id': vuln_id
+        }
         try:
-            return self.rs.get(self.url+"/api/vulns/{}/toggle".format(vuln_id)).json()
+            return self.rs.post(self.url+"/api/vulns/{}/toggle".format(vuln_id), data).json()
         except requests.exceptions.RequestException as e:
             raise PatrowlHearsException("Unable to toggle vuln monitoring status: {}".format(e))
 
